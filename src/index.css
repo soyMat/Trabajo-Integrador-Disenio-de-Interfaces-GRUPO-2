@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-mint text-brand-indigo font-sans antialiased min-h-screen selection:bg-brand-cyan selection:text-brand-indigo;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-teal text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-opacity-90 hover:-translate-y-0.5 hover:shadow-lg focus:ring-2 focus:ring-brand-cyan focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-brand-teal border border-brand-teal px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-brand-mint hover:-translate-y-0.5 hover:shadow focus:ring-2 focus:ring-brand-cyan focus:outline-none;
+  }
+
+  .btn-danger {
+    @apply bg-brand-coral text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-opacity-90 hover:-translate-y-0.5 hover:shadow-lg focus:ring-2 focus:ring-brand-coral focus:outline-none;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-cyan focus:border-transparent outline-none transition-all duration-200 bg-white;
+  }
+
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl;
+  }
+}
