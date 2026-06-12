@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Image as ImageIcon, Upload, Link as LinkIcon } from 'lucide-react';
+import { ChevronLeft, Image as ImageIcon, Upload, Link as LinkIcon, AlertCircle, X } from 'lucide-react';
 import Logo from './Logo';
 
 const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
@@ -14,6 +14,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   });
   const [imageMode, setImageMode] = useState('url'); // 'url' or 'upload'
   const fileInputRef = useRef(null);
+  const [errorPopup, setErrorPopup] = useState(null);
 
   useEffect(() => {
     if (initialData) {
@@ -29,6 +30,19 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'price' && Number(value) < 0) {
+      setErrorPopup('El precio no puede ser negativo');
+      setTimeout(() => setErrorPopup(null), 3000);
+      return;
+    }
+
+    if (name === 'stock' && Number(value) < 0) {
+      setErrorPopup('El stock no puede ser negativo');
+      setTimeout(() => setErrorPopup(null), 3000);
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -55,6 +69,18 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-indigo/40 backdrop-blur-sm">
+      
+      {/* Popup de Error */}
+      {errorPopup && (
+        <div className="fixed top-10 left-1/2 transform -translate-x-1/2 z-[60] bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl flex items-center shadow-lg animate-in fade-in slide-in-from-top-4">
+          <AlertCircle className="w-5 h-5 mr-2" />
+          <span className="font-semibold text-sm">{errorPopup}</span>
+          <button type="button" onClick={() => setErrorPopup(null)} className="ml-4 text-red-500 hover:text-red-700 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="glass-panel w-full max-w-2xl flex flex-col relative overflow-hidden animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
         
         <div className="w-full py-4 flex justify-center bg-white/50 border-b border-gray-100 sticky top-0 z-10">
@@ -133,11 +159,11 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col">
                     <label className="font-bold text-sm text-brand-indigo mb-1">Precio ($)</label>
-                    <input type="number" name="price" value={formData.price} onChange={handleChange} required className="input-field bg-gray-100/50 rounded-full py-1.5 px-4" />
+                    <input type="number" name="price" value={formData.price} onChange={handleChange} required min="0" step="0.01" className="input-field bg-gray-100/50 rounded-full py-1.5 px-4" />
                   </div>
                   <div className="flex flex-col">
                     <label className="font-bold text-sm text-brand-indigo mb-1">Stock</label>
-                    <input type="number" name="stock" value={formData.stock} onChange={handleChange} required className="input-field bg-gray-100/50 rounded-full py-1.5 px-4" />
+                    <input type="number" name="stock" value={formData.stock} onChange={handleChange} required min="0" step="1" className="input-field bg-gray-100/50 rounded-full py-1.5 px-4" />
                   </div>
                 </div>
 
