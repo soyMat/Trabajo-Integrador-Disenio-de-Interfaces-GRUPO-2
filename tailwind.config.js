@@ -9,7 +9,7 @@ export default {
       colors: {
         'brand-teal': '#1A535C',
         'brand-cyan': '#4ECDC4',
-        'brand-mint': '#F7FFF7',
+        'brand-mint': '#F1F5F9',
         'brand-coral': '#F78E69',
         'brand-indigo': '#2B2B3E',
       },

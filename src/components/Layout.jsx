@@ -13,7 +13,7 @@ const Layout = () => {
       </main>
 
       <footer className="bg-[#1C1C1E] text-white py-4 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm sm:text-base font-light text-gray-300">
+        <div className="container mx-auto px-4 text-center text-xs sm:text-base font-light leading-relaxed text-gray-300">
           Austral Market® | Tel: 2901585858 | Dirección: Yrigoyen 879 | Gmail: AustralMarket@gmail.com
         </div>
       </footer>
