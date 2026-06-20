@@ -1,84 +1,126 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import Logo from './Logo';
 
+const correoDemo = 'admin@australmarket.com';
+const contrasenaDemo = 'admin123';
+
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
+  const [datosLogin, setDatosLogin] = useState({ email: '', contrasena: '' });
+  const [errores, setErrores] = useState({});
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate('/productos');
+  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const cambiarCampo = (evento) => {
+    const { name, value } = evento.target;
+    setDatosLogin(datosPrevios => ({ ...datosPrevios, [name]: value }));
+    setErrores(erroresPrevios => ({ ...erroresPrevios, [name]: '', credenciales: '' }));
+  };
+
+  const validarLogin = () => {
+    const erroresNuevos = {};
+
+    if (!datosLogin.email.trim()) {
+      erroresNuevos.email = 'Ingresá tu email.';
+    } else if (!validarEmail(datosLogin.email)) {
+      erroresNuevos.email = 'El email no tiene un formato válido.';
+    }
+
+    if (!datosLogin.contrasena.trim()) {
+      erroresNuevos.contrasena = 'Ingresá tu contraseña.';
+    }
+
+    if (Object.keys(erroresNuevos).length === 0 && (datosLogin.email !== correoDemo || datosLogin.contrasena !== contrasenaDemo)) {
+      erroresNuevos.credenciales = 'Email o contraseña incorrectos.';
+    }
+
+    setErrores(erroresNuevos);
+    return Object.keys(erroresNuevos).length === 0;
+  };
+
+  const ingresar = (evento) => {
+    evento.preventDefault();
+    if (validarLogin()) navigate('/productos');
   };
 
   return (
     <div className="flex-grow flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-5 py-8 sm:p-4">
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => navigate('/productos')}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') navigate('/productos');
-        }}
-        className="cursor-pointer"
-        aria-label="Ir a productos"
-      >
-        <Logo className="mb-8 scale-75 sm:scale-100" />
-      </div>
-      
+      <Logo className="mb-8 scale-75 sm:scale-100" />
+
       <div className="glass-panel w-full max-w-sm p-6 pt-7 relative mt-2 sm:max-w-md sm:p-8 sm:pt-10 sm:mt-4">
         <h2 className="text-xl font-title font-bold text-center text-brand-indigo mb-7 sm:text-2xl sm:mb-8">
           Inicio de Sesión
         </h2>
-        
-        <form onSubmit={handleLogin} className="space-y-6">
+
+        <form onSubmit={ingresar} className="space-y-5" noValidate>
           <div>
-            <label className="block text-center font-bold text-brand-indigo mb-2 text-base sm:text-lg">
-              Email
+            <label htmlFor="email" className="block text-center font-bold text-brand-indigo mb-2 text-base sm:text-lg">
+              Email <span className="text-brand-coral">*</span>
             </label>
-            <input 
-              type="email" 
-              placeholder="ejemploadmin@gmail.com" 
-              className="input-field text-center py-2.5 sm:py-3"
-              required
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={datosLogin.email}
+              onChange={cambiarCampo}
+              placeholder="admin@australmarket.com"
+              className={`input-field bg-white text-center py-2.5 sm:py-3 ${errores.email ? 'input-error' : ''}`}
+              aria-invalid={Boolean(errores.email)}
+              aria-describedby={errores.email ? 'email-error' : undefined}
             />
+            {errores.email && <p id="email-error" className="mt-2 text-center text-xs font-semibold text-red-600">{errores.email}</p>}
           </div>
-          
+
           <div>
-            <label className="block text-center font-bold text-brand-indigo mb-2 text-base sm:text-lg">
-              Contraseña
+            <label htmlFor="contrasena" className="block text-center font-bold text-brand-indigo mb-2 text-base sm:text-lg">
+              Contraseña <span className="text-brand-coral">*</span>
             </label>
             <div className="relative">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                placeholder="***************" 
-                className="input-field text-center py-2.5 pr-11 tracking-widest font-bold sm:py-3"
-                required
+              <input
+                id="contrasena"
+                name="contrasena"
+                type={mostrarContrasena ? 'text' : 'password'}
+                value={datosLogin.contrasena}
+                onChange={cambiarCampo}
+                placeholder="********"
+                className={`input-field bg-white text-center py-2.5 pr-11 tracking-widest font-bold sm:py-3 ${errores.contrasena ? 'input-error' : ''}`}
+                aria-invalid={Boolean(errores.contrasena)}
+                aria-describedby={errores.contrasena ? 'contrasena-error' : undefined}
               />
-              <button 
+              <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-gray-300 bg-white p-1 text-gray-400 hover:text-brand-indigo transition-colors"
-                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                onClick={() => setMostrarContrasena(!mostrarContrasena)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-brand-button hover:text-brand-indigo transition-colors"
+                aria-label={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {mostrarContrasena ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            {errores.contrasena && <p id="contrasena-error" className="mt-2 text-center text-xs font-semibold text-red-600">{errores.contrasena}</p>}
           </div>
-          
-          <div className="flex justify-center pt-1 pb-5 sm:pt-2 sm:pb-4">
-            <button type="submit" className="btn-primary w-28 py-2 text-sm sm:w-40 sm:text-lg">
+
+          {errores.credenciales && (
+            <div className="flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+              <AlertCircle size={16} />
+              {errores.credenciales}
+            </div>
+          )}
+
+          <div className="flex justify-center pt-1 pb-4">
+            <button type="submit" className="btn-primary w-32 py-2 text-sm sm:w-40 sm:text-lg">
               Iniciar
             </button>
           </div>
-          
+
           <div className="flex flex-col items-center gap-5 text-sm font-medium sm:flex-row sm:justify-between sm:gap-0">
-            <a href="#" className="text-brand-teal hover:text-brand-cyan underline transition-colors">
+            <a href="#" className="text-brand-button hover:text-brand-indigo underline transition-colors">
               ¿Olvidó su Contraseña?
             </a>
-            <a href="#" className="text-brand-teal hover:text-brand-cyan underline transition-colors">
-              Registrarse
+            <a href="#" className="text-brand-button hover:text-brand-indigo underline transition-colors">
+              Solicitar acceso
             </a>
           </div>
         </form>

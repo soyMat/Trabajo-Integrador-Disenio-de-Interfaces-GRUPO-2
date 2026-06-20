@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit2, Trash2, Inbox } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, Inbox, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import ProductModal from './ProductModal';
@@ -25,6 +25,7 @@ const ProductTable = () => {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [productoEnEdicion, setProductoEnEdicion] = useState(null);
   const [productoExpandidoId, setProductoExpandidoId] = useState(null);
+  const [mensajeExito, setMensajeExito] = useState('');
 
   const obtenerColorEstado = (estado) => {
     switch (estado) {
@@ -45,12 +46,16 @@ const ProductTable = () => {
     if (datosFormulario.id) {
       // Actualiza el producto que ya existe.
       setProductos(productos.map(producto => producto.id === datosFormulario.id ? datosFormulario : producto));
+      setMensajeExito('Producto actualizado correctamente.');
+      setTimeout(() => setMensajeExito(''), 3000);
       return;
     }
 
     // Agrega el producto nuevo al principio.
     const productoNuevo = { ...datosFormulario, id: Date.now() };
     setProductos([productoNuevo, ...productos]);
+    setMensajeExito('Producto guardado correctamente.');
+    setTimeout(() => setMensajeExito(''), 3000);
   };
 
   const eliminarProducto = (id) => {
@@ -81,7 +86,7 @@ const ProductTable = () => {
           <div className="flex min-w-0 items-center">
             <button
               onClick={() => navigate('/login')}
-              className="mr-3 shrink-0 text-brand-indigo hover:text-brand-teal transition-colors sm:mr-4"
+              className="mr-3 shrink-0 text-brand-indigo hover:text-brand-button transition-colors sm:mr-4"
               aria-label="Volver al login"
             >
               <ArrowLeft size={24} />
@@ -93,9 +98,16 @@ const ProductTable = () => {
             onClick={() => abrirModal()}
             className="btn-primary flex shrink-0 items-center px-3 py-2 text-xs shadow sm:px-4 sm:text-sm"
           >
-            <Plus size={16} className="mr-1 sm:mr-2" /> Anadir Producto
+            <Plus size={16} className="mr-1 sm:mr-2" /> Añadir Producto
           </button>
         </div>
+
+        {mensajeExito && (
+          <div className="mb-4 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+            <CheckCircle size={18} />
+            {mensajeExito}
+          </div>
+        )}
 
         {productos.length === 0 ? (
           <div className="flex-grow flex flex-col items-center justify-center px-4 py-16 text-center text-brand-indigo/60">
@@ -107,7 +119,7 @@ const ProductTable = () => {
           <>
             <div className="space-y-3 md:hidden">
               {productos.map((producto) => (
-                <article key={producto.id} className="rounded-lg border border-brand-teal/15 bg-white/90 p-4 shadow-md shadow-brand-indigo/10">
+                <article key={producto.id} className="rounded-lg border border-brand-separator bg-white/95 p-4 shadow-md shadow-brand-indigo/10">
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="text-base font-bold leading-snug text-brand-teal">{producto.name}</h3>
@@ -119,19 +131,19 @@ const ProductTable = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 rounded-md bg-brand-mint/50 p-3 text-sm text-brand-indigo">
-                    <div>
+                  <div className="grid grid-cols-2 gap-3 rounded-md bg-white/70 p-3 text-sm text-brand-indigo">
+                    <div className="border-r border-brand-button/20 pr-3">
                       <p className="text-[0.65rem] font-bold uppercase text-brand-indigo/50">Precio</p>
                       <p className="font-bold">${Number(producto.price).toLocaleString()}</p>
                     </div>
-                    <div>
+                    <div className="pl-3">
                       <p className="text-[0.65rem] font-bold uppercase text-brand-indigo/50">Stock</p>
                       <p className="font-bold">{producto.stock}</p>
                     </div>
                   </div>
 
                   <div className="mt-4 flex justify-end gap-3 text-brand-indigo/60">
-                    <button onClick={() => abrirModal(producto)} className="flex h-11 w-11 items-center justify-center rounded-md bg-white/70 shadow-sm transition-colors hover:text-brand-teal" title="Editar" aria-label={`Editar ${producto.name}`}>
+                    <button onClick={() => abrirModal(producto)} className="flex h-11 w-11 items-center justify-center rounded-md bg-white shadow-sm transition-colors hover:text-brand-button" title="Editar" aria-label={`Editar ${producto.name}`}>
                       <Edit2 size={20} />
                     </button>
                     <button onClick={() => eliminarProducto(producto.id)} className="flex h-11 w-11 items-center justify-center rounded-md bg-white/70 shadow-sm transition-colors hover:text-brand-coral" title="Eliminar" aria-label={`Eliminar ${producto.name}`}>
@@ -144,7 +156,7 @@ const ProductTable = () => {
 
             <div className="hidden overflow-x-auto pb-4 md:block">
               <table className="w-full text-left text-sm text-brand-indigo border-separate border-spacing-y-2">
-                <thead className="bg-brand-teal text-white">
+                <thead className="bg-brand-button text-white">
                   <tr>
                     <th className="px-4 py-3 font-semibold rounded-tl-lg">Nombre</th>
                     <th className="px-4 py-3 font-semibold">Categoria</th>
@@ -157,12 +169,12 @@ const ProductTable = () => {
                 <tbody>
                   {productos.map((producto) => (
                     <React.Fragment key={producto.id}>
-                      <tr className="bg-white/40 hover:bg-white/80 transition-all duration-200 shadow-sm rounded-lg group">
+                      <tr className="bg-white/80 hover:bg-white transition-all duration-200 shadow-sm rounded-lg group">
                         <td className="px-4 py-4 font-semibold text-brand-teal rounded-l-lg">
                           <button
                             type="button"
                             onClick={() => setProductoExpandidoId(productoExpandidoId === producto.id ? null : producto.id)}
-                            className="border-b border-dashed border-brand-teal/50 text-left transition-colors hover:text-brand-cyan"
+                            className="border-b border-dashed border-brand-button/50 text-left transition-colors hover:text-brand-indigo"
                             aria-expanded={productoExpandidoId === producto.id}
                           >
                             {producto.name}
@@ -173,15 +185,15 @@ const ProductTable = () => {
                         <td className="px-4 py-4 text-center">{producto.stock}</td>
                         <td className="px-4 py-4">
                           <div className="flex justify-center items-center h-full">
-                            <div
-                              className={`w-3.5 h-3.5 rounded-full ${obtenerColorEstado(producto.status)}`}
-                              title={producto.status}
-                            ></div>
+                            <span className="inline-flex items-center gap-2 text-xs font-semibold text-brand-indigo">
+                              <span className={`w-3 h-3 rounded-full ${obtenerColorEstado(producto.status)}`} title={producto.status}></span>
+                              {producto.status}
+                            </span>
                           </div>
                         </td>
                         <td className="px-4 py-4 rounded-r-lg">
                           <div className="flex justify-center space-x-3 text-brand-indigo/60">
-                            <button onClick={() => abrirModal(producto)} className="p-1 hover:text-brand-teal transition-colors" title="Editar">
+                            <button onClick={() => abrirModal(producto)} className="p-1 hover:text-brand-button transition-colors" title="Editar">
                               <Edit2 size={16} />
                             </button>
                             <button onClick={() => eliminarProducto(producto.id)} className="p-1 hover:text-brand-coral transition-colors" title="Eliminar">
@@ -191,10 +203,10 @@ const ProductTable = () => {
                         </td>
                       </tr>
                       {productoExpandidoId === producto.id && (
-                        <tr className="bg-white/70 shadow-sm">
+                        <tr className="bg-white/90 shadow-sm">
                           <td colSpan="6" className="rounded-lg px-4 py-4">
                             <div className="flex gap-4">
-                              <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-mint/60">
+                              <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-surface">
                                 <img src={producto.imageUrl} alt={producto.name} className="h-full w-full object-cover" />
                               </div>
                               <div className="min-w-0 flex-1">

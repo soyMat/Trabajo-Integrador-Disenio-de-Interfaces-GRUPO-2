@@ -7,11 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-teal': '#1A535C',
-        'brand-cyan': '#4ECDC4',
-        'brand-mint': '#F1F5F9',
+        'brand-screen': '#7F8BB2',
+        'brand-surface': '#E1E4EB',
+        'brand-separator': '#F3EFE7',
+        'brand-button': '#364674',
+        'brand-teal': '#364674',
+        'brand-cyan': '#6675A1',
+        'brand-mint': '#E1E4EB',
         'brand-coral': '#F78E69',
-        'brand-indigo': '#2B2B3E',
+        'brand-indigo': '#1C1C1E',
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Space Mono', 'sans-serif'],

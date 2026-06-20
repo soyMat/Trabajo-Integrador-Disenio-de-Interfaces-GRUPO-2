@@ -17,34 +17,27 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const navigate = useNavigate();
   const [datosFormulario, setDatosFormulario] = useState(datosVacios);
   const [modoImagen, setModoImagen] = useState('url');
-  const referenciaArchivo = useRef(null);
+  const [errores, setErrores] = useState({});
   const [mensajeError, setMensajeError] = useState(null);
+  const referenciaArchivo = useRef(null);
 
   useEffect(() => {
     setDatosFormulario(initialData || datosVacios);
+    setErrores({});
+    setMensajeError(null);
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
-  const mostrarError = (mensaje) => {
+  const mostrarErrorGeneral = (mensaje) => {
     setMensajeError(mensaje);
     setTimeout(() => setMensajeError(null), 3000);
   };
 
   const cambiarCampo = (evento) => {
     const { name, value } = evento.target;
-
-    if (name === 'price' && Number(value) < 0) {
-      mostrarError('El precio no puede ser negativo');
-      return;
-    }
-
-    if (name === 'stock' && Number(value) < 0) {
-      mostrarError('El stock no puede ser negativo');
-      return;
-    }
-
     setDatosFormulario(datosPrevios => ({ ...datosPrevios, [name]: value }));
+    setErrores(erroresPrevios => ({ ...erroresPrevios, [name]: '' }));
   };
 
   const cambiarArchivo = (evento) => {
@@ -55,20 +48,47 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     setDatosFormulario(datosPrevios => ({ ...datosPrevios, imageUrl: urlTemporal }));
   };
 
+  const validarFormulario = () => {
+    const erroresNuevos = {};
+    const precio = Number(datosFormulario.price);
+    const stock = Number(datosFormulario.stock);
+
+    if (!datosFormulario.name.trim()) erroresNuevos.name = 'Ingresá el nombre del producto.';
+    if (!datosFormulario.description.trim()) erroresNuevos.description = 'Ingresá una descripción.';
+    if (!datosFormulario.category) erroresNuevos.category = 'Seleccioná una categoría.';
+    if (!datosFormulario.price) erroresNuevos.price = 'Ingresá el precio.';
+    if (datosFormulario.price && (Number.isNaN(precio) || precio <= 0)) erroresNuevos.price = 'El precio debe ser mayor que cero.';
+    if (datosFormulario.stock === '') erroresNuevos.stock = 'Ingresá el stock.';
+    if (datosFormulario.stock !== '' && (Number.isNaN(stock) || stock < 0)) erroresNuevos.stock = 'El stock no puede ser negativo.';
+    if (!datosFormulario.status) erroresNuevos.status = 'Seleccioná un estado.';
+
+    setErrores(erroresNuevos);
+    return Object.keys(erroresNuevos).length === 0;
+  };
+
   const enviarFormulario = (evento) => {
     evento.preventDefault();
+
+    if (!validarFormulario()) {
+      mostrarErrorGeneral('Revisá los campos marcados antes de guardar.');
+      return;
+    }
+
     if (onSave) onSave(datosFormulario);
     onClose();
   };
 
   const limpiarFormulario = () => {
     setDatosFormulario(datosVacios);
+    setErrores({});
   };
 
   const irAProductos = () => {
     onClose();
     navigate('/productos');
   };
+
+  const claseCampo = (nombreCampo) => `input-field ${errores[nombreCampo] ? 'input-error' : ''}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-brand-indigo/40 p-5 pt-8 backdrop-blur-sm sm:items-center sm:p-4" onClick={onClose}>
@@ -83,48 +103,46 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       )}
 
       <div className="glass-panel relative flex w-full max-w-2xl animate-in flex-col overflow-hidden duration-200 fade-in zoom-in max-h-[90vh] overflow-y-auto" onClick={(evento) => evento.stopPropagation()}>
-        <div className="sticky top-0 z-10 flex w-full justify-center border-b border-gray-100/70 bg-white/50 py-2 sm:py-3">
-          <div
-            role="button"
-            tabIndex={0}
+        <div className="sticky top-0 z-10 flex w-full justify-center border-b border-brand-separator bg-white py-1.5">
+          <button
+            type="button"
             onClick={irAProductos}
-            onKeyDown={(evento) => {
-              if (evento.key === 'Enter' || evento.key === ' ') irAProductos();
-            }}
-            className="cursor-pointer"
+            className="transition-opacity hover:opacity-80"
             aria-label="Ir a productos"
           >
-            <Logo className="origin-top scale-[0.55] sm:scale-[0.65]" />
-          </div>
+            <Logo className="scale-[0.38] origin-center -my-7" />
+          </button>
         </div>
 
         <div className="p-5 sm:p-6">
           <button
             type="button"
             onClick={onClose}
-            className="mb-5 flex items-center text-sm font-semibold text-brand-indigo transition-colors hover:text-brand-teal sm:mb-6"
+            className="mb-5 flex items-center text-sm font-semibold text-brand-button transition-colors hover:text-brand-indigo sm:mb-6"
             aria-label="Volver"
           >
             <ChevronLeft size={16} className="mr-1" />
             Atras
           </button>
 
-          <form onSubmit={enviarFormulario} className="space-y-5 sm:space-y-6">
+          <form onSubmit={enviarFormulario} className="space-y-5 sm:space-y-6" noValidate>
             <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex flex-col">
-                  <label className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Nombre del Producto</label>
-                  <input type="text" name="name" value={datosFormulario.name} onChange={cambiarCampo} required className="input-field rounded-full bg-gray-200/80 px-4 py-1.5" />
+                  <label htmlFor="name" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Nombre del Producto <span className="text-brand-coral">*</span></label>
+                  <input id="name" type="text" name="name" value={datosFormulario.name} onChange={cambiarCampo} className={`${claseCampo('name')} rounded-full bg-white px-4 py-1.5`} />
+                  {errores.name && <p className="mt-1 text-xs font-semibold text-red-600">{errores.name}</p>}
                 </div>
 
                 <div className="flex flex-col">
-                  <label className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Descripcion</label>
-                  <textarea name="description" value={datosFormulario.description} onChange={cambiarCampo} className="input-field h-16 resize-none rounded-xl bg-gray-200/80 px-4 py-2 sm:h-20"></textarea>
+                  <label htmlFor="description" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Descripcion <span className="text-brand-coral">*</span></label>
+                  <textarea id="description" name="description" value={datosFormulario.description} onChange={cambiarCampo} className={`${claseCampo('description')} h-16 resize-none rounded-xl bg-white px-4 py-2 sm:h-20`}></textarea>
+                  {errores.description && <p className="mt-1 text-xs font-semibold text-red-600">{errores.description}</p>}
                 </div>
 
                 <div className="flex flex-col">
-                  <label className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Categorias</label>
-                  <select name="category" value={datosFormulario.category} onChange={cambiarCampo} required className="input-field cursor-pointer appearance-none rounded-full bg-gray-200/80 px-4 py-1.5 text-sm">
+                  <label htmlFor="category" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Categoria <span className="text-brand-coral">*</span></label>
+                  <select id="category" name="category" value={datosFormulario.category} onChange={cambiarCampo} className={`${claseCampo('category')} cursor-pointer appearance-none rounded-full bg-white px-4 py-1.5 text-sm`}>
                     <option value="" disabled>Seleccione una categoria</option>
                     <option value="Bebidas">Bebidas</option>
                     <option value="Mermeladas y Dulces">Mermeladas y Dulces</option>
@@ -133,18 +151,19 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     <option value="Conservas">Conservas</option>
                     <option value="Condimentos">Condimentos</option>
                   </select>
+                  {errores.category && <p className="mt-1 text-xs font-semibold text-red-600">{errores.category}</p>}
                 </div>
               </div>
 
               <div className="space-y-3 sm:space-y-4">
-                <div className="flex flex-col rounded-xl border border-dashed border-brand-teal/30 bg-brand-mint/20 p-3">
+                <div className="flex flex-col rounded-xl border border-dashed border-brand-button/30 bg-white/45 p-3">
                   <label className="mb-2 flex items-center justify-between text-sm font-bold text-brand-indigo">
                     <span>Imagen del Producto</span>
                     <div className="flex space-x-2 text-xs">
-                      <button type="button" onClick={() => setModoImagen('url')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'url' ? 'bg-brand-teal text-white' : 'bg-white text-gray-500'}`}>
+                      <button type="button" onClick={() => setModoImagen('url')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'url' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
                         <LinkIcon size={12} className="mr-1" /> URL
                       </button>
-                      <button type="button" onClick={() => setModoImagen('upload')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'upload' ? 'bg-brand-teal text-white' : 'bg-white text-gray-500'}`}>
+                      <button type="button" onClick={() => setModoImagen('upload')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'upload' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
                         <Upload size={12} className="mr-1" /> Archivo
                       </button>
                     </div>
@@ -155,14 +174,14 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   ) : (
                     <div className="flex flex-col items-center">
                       <input type="file" accept="image/*" ref={referenciaArchivo} onChange={cambiarArchivo} className="hidden" />
-                      <button type="button" onClick={() => referenciaArchivo.current.click()} className="flex w-full items-center justify-center rounded border border-gray-200 bg-white py-1.5 text-xs text-brand-indigo hover:bg-gray-50">
+                      <button type="button" onClick={() => referenciaArchivo.current.click()} className="flex w-full items-center justify-center rounded border border-brand-separator bg-white py-1.5 text-xs text-brand-indigo hover:bg-brand-separator">
                         <Upload size={14} className="mr-2" /> Seleccionar de la PC
                       </button>
                     </div>
                   )}
 
                   {datosFormulario.imageUrl && (
-                    <div className="mt-2 flex h-20 w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                    <div className="mt-2 flex h-20 w-full items-center justify-center overflow-hidden rounded-lg border border-brand-separator bg-gray-50">
                       <img src={datosFormulario.imageUrl} alt="Vista previa" className="max-h-full max-w-full object-contain" />
                     </div>
                   )}
@@ -170,42 +189,38 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <label className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Precio</label>
-                    <input type="number" name="price" value={datosFormulario.price} onChange={cambiarCampo} required min="0" step="0.01" className="input-field rounded-full bg-gray-200/80 px-4 py-1.5" />
+                    <label htmlFor="price" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Precio <span className="text-brand-coral">*</span></label>
+                    <input id="price" type="number" name="price" value={datosFormulario.price} onChange={cambiarCampo} min="0.01" step="0.01" className={`${claseCampo('price')} rounded-full bg-white px-4 py-1.5`} />
+                    {errores.price && <p className="mt-1 text-xs font-semibold text-red-600">{errores.price}</p>}
                   </div>
                   <div className="flex flex-col">
-                    <label className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Stock</label>
-                    <input type="number" name="stock" value={datosFormulario.stock} onChange={cambiarCampo} required min="0" step="1" className="input-field rounded-full bg-gray-200/80 px-4 py-1.5" />
+                    <label htmlFor="stock" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Stock <span className="text-brand-coral">*</span></label>
+                    <input id="stock" type="number" name="stock" value={datosFormulario.stock} onChange={cambiarCampo} min="0" step="1" className={`${claseCampo('stock')} rounded-full bg-white px-4 py-1.5`} />
+                    {errores.stock && <p className="mt-1 text-xs font-semibold text-red-600">{errores.stock}</p>}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
-                  <label className="flex cursor-pointer items-center space-x-2">
-                    <input type="radio" name="status" value="Activo" checked={datosFormulario.status === 'Activo'} onChange={cambiarCampo} className="text-emerald-500 focus:ring-emerald-500" />
-                    <span className="text-xs font-semibold text-brand-indigo">Activo</span>
-                  </label>
-                  <label className="flex cursor-pointer items-center space-x-2">
-                    <input type="radio" name="status" value="Sin Stock" checked={datosFormulario.status === 'Sin Stock'} onChange={cambiarCampo} className="text-red-500 focus:ring-red-500" />
-                    <span className="text-xs font-semibold text-brand-indigo">Sin Stock</span>
-                  </label>
-                  <label className="flex cursor-pointer items-center space-x-2">
-                    <input type="radio" name="status" value="Descontinuado" checked={datosFormulario.status === 'Descontinuado'} onChange={cambiarCampo} className="text-gray-500 focus:ring-gray-500" />
-                    <span className="text-xs font-semibold text-brand-indigo">Descontinuado</span>
-                  </label>
-                  <label className="flex cursor-pointer items-center space-x-2">
-                    <input type="radio" name="status" value="Bajo Stock" checked={datosFormulario.status === 'Bajo Stock'} onChange={cambiarCampo} className="text-amber-400 focus:ring-amber-400" />
-                    <span className="text-xs font-semibold text-brand-indigo">Bajo Stock</span>
-                  </label>
-                </div>
+                <fieldset className={`rounded-xl border p-3 ${errores.status ? 'border-red-400 bg-red-50' : 'border-brand-separator bg-white/45'}`}>
+                  <legend className="px-1 text-sm font-bold text-brand-indigo">Estado <span className="text-brand-coral">*</span></legend>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
+                    {['Activo', 'Sin Stock', 'Descontinuado', 'Bajo Stock'].map((estado) => (
+                      <label key={estado} className="flex cursor-pointer items-center space-x-2">
+                        <input type="radio" name="status" value={estado} checked={datosFormulario.status === estado} onChange={cambiarCampo} className="text-brand-button focus:ring-brand-screen" />
+                        <span className="text-xs font-semibold text-brand-indigo">{estado}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {errores.status && <p className="mt-2 text-xs font-semibold text-red-600">{errores.status}</p>}
+                </fieldset>
               </div>
             </div>
 
-            <div className="flex justify-center space-x-4 border-t border-gray-100 pt-4">
+            <div className="flex justify-center space-x-4 border-t border-brand-separator pt-4">
               <button type="button" onClick={limpiarFormulario} className="btn-secondary w-28 py-1.5 text-sm sm:w-32">
                 Limpiar
               </button>
               <button type="submit" className="btn-primary w-28 py-1.5 text-sm sm:w-32">
-                Aplicar
+                Guardar
               </button>
             </div>
           </form>

@@ -4,17 +4,17 @@
 
 @layer base {
   body {
-    @apply bg-brand-mint text-brand-indigo font-sans antialiased min-h-screen selection:bg-brand-cyan selection:text-brand-indigo;
+    @apply bg-brand-screen text-brand-indigo font-sans antialiased min-h-screen selection:bg-brand-button selection:text-white;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-brand-teal text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-opacity-90 hover:-translate-y-0.5 hover:shadow-lg focus:ring-2 focus:ring-brand-cyan focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-brand-button text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-opacity-90 hover:-translate-y-0.5 hover:shadow-lg focus:ring-2 focus:ring-brand-screen focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-white text-brand-teal border border-brand-teal px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-brand-mint hover:-translate-y-0.5 hover:shadow focus:ring-2 focus:ring-brand-cyan focus:outline-none;
+    @apply bg-white text-brand-button border border-brand-button px-4 py-2 rounded-md font-medium transition-all duration-300 hover:bg-brand-surface hover:-translate-y-0.5 hover:shadow focus:ring-2 focus:ring-brand-screen focus:outline-none;
   }
 
   .btn-danger {
@@ -22,7 +22,11 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-cyan focus:border-transparent outline-none transition-all duration-200 bg-white;
+    @apply w-full px-4 py-2 border border-brand-separator rounded-md focus:ring-2 focus:ring-brand-screen focus:border-brand-button outline-none transition-all duration-200 bg-white;
+  }
+
+  .input-error {
+    @apply border-red-400 bg-red-50 focus:ring-red-300 focus:border-red-500;
   }
 
   .input-field::-ms-reveal,
@@ -31,6 +35,6 @@
   }
 
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl;
+    @apply bg-brand-surface/95 backdrop-blur-md border border-brand-separator shadow-xl rounded-2xl;
   }
 }
