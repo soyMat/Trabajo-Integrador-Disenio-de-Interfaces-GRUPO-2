@@ -90,6 +90,8 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
   const claseCampo = (nombreCampo) => `input-field ${errores[nombreCampo] ? 'input-error' : ''}`;
 
+  const esEdicion = Boolean(initialData);
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-brand-indigo/40 p-5 pt-8 backdrop-blur-sm sm:items-center sm:p-4" onClick={onClose}>
       {mensajeError && (
@@ -115,20 +117,29 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         </div>
 
         <div className="p-5 sm:p-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="mb-5 flex items-center text-sm font-semibold text-brand-button transition-colors hover:text-brand-indigo sm:mb-6"
-            aria-label="Volver"
-          >
-            <ChevronLeft size={16} className="mr-1" />
-            Atras
-          </button>
+          <div className="grid grid-cols-3 items-center mb-6 w-full">
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex items-center text-sm font-semibold text-brand-button transition-colors hover:text-brand-indigo"
+                aria-label="Volver"
+              >
+                <ChevronLeft size={16} className="mr-1" />
+                Atrás
+              </button>
+            </div>
+            <div className="flex justify-center col-span-1">
+              <h2 className="text-xl font-title font-bold text-center text-brand-indigo whitespace-nowrap sm:text-2xl">
+                {esEdicion ? 'Editar Producto' : 'Crear Producto'}
+              </h2>
+            </div>
+            <div className="hidden sm:block"></div>
+          </div>
 
           <form onSubmit={enviarFormulario} className="space-y-6" noValidate>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               
-              {/* BLOQUE IZQUIERDO: INFORMACIÓN GENERAL */}
               <div className="flex flex-col gap-4">
                 <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
                   Información General
@@ -168,7 +179,6 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 </div>
               </div>
 
-              {/* BLOQUE DERECHO: ESTADO Y CATEGORÍA */}
               <div className="flex flex-col gap-4">
                 <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
                   Estado y Categoría
@@ -241,7 +251,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 Limpiar
               </button>
               <button type="submit" className="btn-primary w-28 py-1.5 text-sm sm:w-32">
-                Guardar
+                {esEdicion ? 'Guardar' : 'Crear'}
               </button>
             </div>
           </form>
