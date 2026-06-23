@@ -58,6 +58,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     const precio = Number(datosFormulario.price);
     const stock = Number(datosFormulario.stock);
 
+    // errores por campo vacio
     if (!datosFormulario.name.trim()) erroresNuevos.name = 'Ingresá el nombre del producto.';
     if (!datosFormulario.description.trim()) erroresNuevos.description = 'Ingresá una descripción.';
     if (!datosFormulario.category) erroresNuevos.category = 'Seleccioná una categoría.';
@@ -79,6 +80,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       return;
     }
 
+    // confirmación de edición (pop-up)
     if (esEdicion) {
       const confirmaEdicion = window.confirm(`Seguro que queres guardar los cambios de "${datosFormulario.name}"?`);
       if (!confirmaEdicion) return;
