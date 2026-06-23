@@ -110,8 +110,8 @@ const Login = () => {
           </div>
 
           {errores.credenciales && (
-            <div className="flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
-              <AlertCircle size={16} />
+            <div className="flex items-center justify-center gap-2 rounded-md border border-brand-separator bg-white px-3 py-2 text-sm font-semibold text-brand-indigo shadow-sm">
+              <AlertCircle size={16} className="text-red-600" />
               {errores.credenciales}
             </div>
           )}
