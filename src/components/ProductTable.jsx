@@ -5,9 +5,11 @@ import Logo from './Logo';
 import ProductModal from './ProductModal';
 
 // Imagen que se usa cuando un producto no tiene foto propia.
+// Esto evita que el listado quede roto si falta una imagen real.
 const imagenPorDefecto = "https://placehold.co/300x300/F7FFF7/1A535C?text=Foto+del+Producto";
 
 // Datos simulados para mostrar el catalogo sin usar una base de datos.
+// Cada objeto representa un producto y tiene los campos que luego se muestran en la tabla.
 const productosIniciales = [
   { id: 1, name: 'Dulce de Calafate (200g)', category: 'Mermeladas y Dulces', price: 1200, stock: 45, status: 'Activo', description: 'Exquisito dulce patagonico, ideal para desayunos.', imageUrl: 'https://imgs.search.brave.com/zqFK2uNnphe9lbAqNyYQWy-1LiZMraA2DoPjoa7pD0Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9odHRw/Mi5tbHN0YXRpYy5j/b20vRF9OUV9OUF85/OTY5OTktTUxBNzc4/MTM5MjAxMTBfMDcy/MDI0LU8ud2VicA' },
   { id: 2, name: 'Ahumado de Centolla', category: 'Pescados y Mariscos', price: 3500, stock: 0, status: 'Sin Stock', description: 'Centolla fueguina ahumada con madera de lenga.', imageUrl: 'https://imgs.search.brave.com/mEfrADJvIhUmezBaVCzuICTsNL4DDjP3ge-4qw5YWH0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9odHRw/Mi5tbHN0YXRpYy5j/b20vRF9OUV9OUF83/NTc2NTctTUxBNzAz/OTA4OTM3NTZfMDcy/MDIzLU8ud2VicA' },
@@ -22,24 +24,32 @@ const productosIniciales = [
 ];
 
 const ProductTable = () => {
+  // useNavigate permite cambiar de pantalla desde codigo.
+  // En esta pantalla se usa para volver al login o mantenerse en productos.
   const navigate = useNavigate();
 
   // Guarda la lista actual de productos que se muestra en pantalla.
+  // Cuando se crea, edita o elimina, se actualiza este estado con setProductos.
   const [productos, setProductos] = useState(productosIniciales);
 
   // Controla si el formulario de producto esta abierto o cerrado.
+  // true muestra ProductModal, false lo mantiene oculto.
   const [modalAbierto, setModalAbierto] = useState(false);
 
   // Guarda el producto que se esta editando. Si es null, se crea uno nuevo.
+  // Este dato se envia al modal para rellenar el formulario en modo edicion.
   const [productoEnEdicion, setProductoEnEdicion] = useState(null);
 
   // Guarda el id del producto que tiene abierto el detalle desplegable.
+  // Si el id coincide con una fila, se muestra la descripcion y la imagen de ese producto.
   const [productoExpandidoId, setProductoExpandidoId] = useState(null);
 
   // Muestra mensajes de confirmacion despues de crear, editar o eliminar.
+  // Se limpia automaticamente con setTimeout para no dejar el cartel fijo.
   const [mensajeExito, setMensajeExito] = useState('');
 
   // Devuelve el color del punto de estado segun la situacion del producto.
+  // El texto del estado tambien se muestra, por eso no depende solo del color.
   const obtenerColorEstado = (estado) => {
     switch (estado) {
       case 'Activo': return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
@@ -51,6 +61,7 @@ const ProductTable = () => {
   };
 
   // Abre el formulario. Si recibe un producto, lo abre en modo edicion.
+  // Si no recibe nada, producto queda en null y el modal funciona como alta.
   const abrirModal = (producto = null) => {
     setProductoEnEdicion(producto);
     setModalAbierto(true);
@@ -59,14 +70,14 @@ const ProductTable = () => {
   // Guarda un producto nuevo o actualiza uno existente segun tenga id.
   const guardarProducto = (datosFormulario) => {
     if (datosFormulario.id) {
-      // Actualiza el producto que ya existe.
+      // Edicion: recorre la lista y reemplaza solo el producto con el mismo id.
       setProductos(productos.map(producto => producto.id === datosFormulario.id ? datosFormulario : producto));
       setMensajeExito('Producto actualizado correctamente.');
       setTimeout(() => setMensajeExito(''), 3000);
       return;
     }
 
-    // Agrega el producto nuevo al principio.
+    // Alta: crea un id temporal y agrega el producto nuevo al principio de la lista.
     const productoNuevo = { ...datosFormulario, id: Date.now() };
     setProductos([productoNuevo, ...productos]);
     setMensajeExito('Producto guardado correctamente.');
@@ -76,6 +87,7 @@ const ProductTable = () => {
   // Elimina un producto despues de pedir confirmacion al usuario.
   const eliminarProducto = (id) => {
     if (window.confirm('Seguro que deseas eliminar este producto?')) {
+      // filter devuelve una nueva lista sin el producto eliminado.
       setProductos(productos.filter(producto => producto.id !== id));
       setMensajeExito('Producto eliminado correctamente.');
       setTimeout(() => setMensajeExito(''), 3000);
@@ -86,7 +98,9 @@ const ProductTable = () => {
   const irAProductos = () => navigate('/productos');
 
   return (
+    // Contenedor general de la pantalla de productos.
     <div className="flex flex-col items-center min-h-[calc(100vh-60px)] p-4 pt-6">
+      {/* Logo superior. Tambien funciona como acceso a /productos con click o teclado. */}
       <div
         role="button"
         tabIndex={0}
@@ -100,7 +114,9 @@ const ProductTable = () => {
         <Logo className="mb-6 scale-75 origin-top sm:scale-90" />
       </div>
 
+      {/* Panel principal: contiene titulo, acciones, mensajes y listado. */}
       <div className="glass-panel w-full max-w-5xl flex flex-col p-4 min-h-[500px] relative sm:p-6">
+        {/* Cabecera de la pantalla: volver al login, titulo y boton de alta. */}
         <div className="flex justify-between items-center gap-3 mb-6">
           <div className="flex min-w-0 items-center">
             <button
@@ -121,6 +137,7 @@ const ProductTable = () => {
           </button>
         </div>
 
+        {/* Feedback visual para avisar que una accion se completo correctamente. */}
         {mensajeExito && (
           <div className="mb-4 flex items-center gap-2 rounded-md border border-brand-separator bg-white px-4 py-3 text-sm font-semibold text-brand-indigo shadow-sm">
             <CheckCircle size={18} className="text-emerald-600" />
@@ -128,6 +145,7 @@ const ProductTable = () => {
           </div>
         )}
 
+        {/* Render condicional: si no hay productos muestra estado vacio, si hay muestra listados. */}
         {productos.length === 0 ? (
           <div className="flex-grow flex flex-col items-center justify-center px-4 py-16 text-center text-brand-indigo/60">
             <Inbox size={96} strokeWidth={1} className="mb-4 text-gray-500 sm:size-20" />
@@ -138,8 +156,10 @@ const ProductTable = () => {
           <>
             {/* Version mobile: muestra productos como tarjetas para que sean faciles de tocar. */}
             <div className="space-y-3 md:hidden">
+              {/* map recorre todos los productos y crea una tarjeta por cada uno. */}
               {productos.map((producto) => (
                 <article key={producto.id} className="rounded-lg border border-brand-separator bg-white/95 p-4 shadow-md shadow-brand-indigo/10">
+                  {/* Parte superior de la tarjeta: nombre, categoria y estado. */}
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="text-base font-bold leading-snug text-brand-teal">{producto.name}</h3>
@@ -151,6 +171,7 @@ const ProductTable = () => {
                     </div>
                   </div>
 
+                  {/* Bloque de datos numericos en mobile: precio y stock separados por una linea. */}
                   <div className="grid grid-cols-2 gap-3 rounded-md bg-white/70 p-3 text-sm text-brand-indigo">
                     <div className="border-r border-brand-button/20 pr-3">
                       <p className="text-[0.65rem] font-bold uppercase text-brand-indigo/50">Precio</p>
@@ -162,6 +183,7 @@ const ProductTable = () => {
                     </div>
                   </div>
 
+                  {/* Acciones mobile: botones grandes para editar y eliminar con el dedo. */}
                   <div className="mt-4 flex justify-end gap-3 text-brand-indigo/60">
                     <button onClick={() => abrirModal(producto)} className="flex h-11 w-11 items-center justify-center rounded-md bg-white shadow-sm transition-colors hover:text-brand-button" title="Editar" aria-label={`Editar ${producto.name}`}>
                       <Edit2 size={20} />
@@ -177,6 +199,7 @@ const ProductTable = () => {
             {/* Version desktop: muestra productos en tabla con columnas y detalle desplegable. */}
             <div className="hidden overflow-x-auto pb-4 md:block">
               <table className="w-full text-left text-sm text-brand-indigo border-separate border-spacing-y-2">
+                {/* Encabezado de la tabla: define que representa cada columna. */}
                 <thead className="bg-brand-button text-white">
                   <tr>
                     <th className="px-4 py-3 font-semibold rounded-tl-lg">Nombre</th>
@@ -188,8 +211,10 @@ const ProductTable = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* map recorre la lista y crea una fila de tabla por cada producto. */}
                   {productos.map((producto) => (
                     <React.Fragment key={producto.id}>
+                      {/* Fila principal del producto. El hover ayuda a diferenciar la fila activa. */}
                       <tr className="bg-white/80 hover:bg-white transition-all duration-200 shadow-sm rounded-lg group">
                         <td className="px-4 py-4 font-semibold text-brand-teal rounded-l-lg">
                           <button
@@ -201,11 +226,13 @@ const ProductTable = () => {
                             {producto.name}
                           </button>
                         </td>
+                        {/* Datos basicos del producto en columnas. */}
                         <td className="px-4 py-4 text-sm">{producto.category}</td>
                         <td className="px-4 py-4 font-medium text-right">${Number(producto.price).toLocaleString()}</td>
                         <td className="px-4 py-4 text-center">{producto.stock}</td>
                         <td className="px-4 py-4">
                           <div className="flex justify-center items-center h-full">
+                            {/* Estado: combina punto de color con texto para ser mas claro. */}
                             <span className="inline-flex items-center gap-2 text-xs font-semibold text-brand-indigo">
                               <span className={`w-3 h-3 rounded-full ${obtenerColorEstado(producto.status)}`} title={producto.status}></span>
                               {producto.status}
@@ -213,6 +240,7 @@ const ProductTable = () => {
                           </div>
                         </td>
                         <td className="px-4 py-4 rounded-r-lg">
+                          {/* Acciones desktop: editar abre el modal, eliminar pide confirmacion. */}
                           <div className="flex justify-center space-x-3 text-brand-indigo/60">
                             <button onClick={() => abrirModal(producto)} className="p-1 hover:text-brand-button transition-colors" title="Editar" aria-label={`Editar ${producto.name}`}>
                               <Edit2 size={16} />
@@ -224,12 +252,15 @@ const ProductTable = () => {
                         </td>
                       </tr>
                       {productoExpandidoId === producto.id && (
+                        // Esta fila extra se muestra solo cuando el producto esta expandido.
                         <tr className="bg-white/90 shadow-sm">
                           <td colSpan="6" className="rounded-lg px-4 py-4">
                             <div className="flex gap-4">
+                              {/* Imagen del producto dentro del detalle desplegable. */}
                               <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-surface">
                                 <img src={producto.imageUrl} alt={producto.name} className="h-full w-full object-cover" />
                               </div>
+                              {/* Informacion ampliada: nombre, precio, descripcion y datos secundarios. */}
                               <div className="min-w-0 flex-1">
                                 <h4 className="mb-1 font-bold text-brand-indigo">{producto.name}</h4>
                                 <p className="mb-2 text-sm font-semibold text-brand-teal">${Number(producto.price).toLocaleString()}</p>
@@ -257,10 +288,15 @@ const ProductTable = () => {
         )}
       </div>
 
+      {/* Modal compartido para alta y edicion de productos. */}
       <ProductModal
+        // isOpen decide si el modal se ve o no.
         isOpen={modalAbierto}
+        // onClose se ejecuta cuando el modal se cierra.
         onClose={() => setModalAbierto(false)}
+        // onSave recibe los datos validados del formulario.
         onSave={guardarProducto}
+        // initialData indica si se edita un producto o se crea uno nuevo.
         initialData={productoEnEdicion}
       />
     </div>
