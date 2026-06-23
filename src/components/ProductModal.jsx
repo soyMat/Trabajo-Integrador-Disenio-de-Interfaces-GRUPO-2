@@ -15,10 +15,15 @@ const datosVacios = {
 
 const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const navigate = useNavigate();
+
   const [datosFormulario, setDatosFormulario] = useState(datosVacios);
+
   const [modoImagen, setModoImagen] = useState('url');
+
   const [errores, setErrores] = useState({});
+
   const [mensajeError, setMensajeError] = useState(null);
+
   const referenciaArchivo = useRef(null);
 
   useEffect(() => {
@@ -128,8 +133,8 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         </div>
 
         <div className="p-5 sm:p-6">
-          <div className="grid grid-cols-3 items-center mb-6 w-full">
-            <div className="flex justify-start">
+          <div className="relative mb-6 flex min-h-[3.25rem] w-full items-start justify-center">
+            <div className="absolute left-0 top-1 flex justify-start">
               <button
                 type="button"
                 onClick={onClose}
@@ -140,8 +145,8 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 Atrás
               </button>
             </div>
-            <div className="flex flex-col items-center justify-center col-span-1 gap-1">
-              <span className={`rounded-full px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wide ${esEdicion ? 'bg-brand-button text-white' : 'bg-white text-brand-button border border-brand-button/25'}`}>
+            <div className="flex max-w-[11rem] flex-col items-center justify-center gap-1 text-center sm:max-w-none">
+              <span className={`rounded-full px-4 py-1 text-center text-[0.65rem] font-bold uppercase leading-tight tracking-wide ${esEdicion ? 'bg-brand-button text-white' : 'bg-white text-brand-button border border-brand-button/25'}`}>
                 {esEdicion ? 'Modo edicion' : 'Producto nuevo'}
               </span>
               {esEdicion && (
@@ -150,12 +155,12 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 </p>
               )}
             </div>
-            <div className="hidden sm:block"></div>
           </div>
 
           <form onSubmit={enviarFormulario} className="space-y-6" noValidate>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               
+              {/* Datos principales del producto. */}
               <div className="flex flex-col gap-4">
                 <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
                   Información General
@@ -195,6 +200,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 </div>
               </div>
 
+              {/* Categoria, estado e imagen del producto. */}
               <div className="flex flex-col gap-4">
                 <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
                   Estado y Categoría
@@ -262,6 +268,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
               </div>
             </div>
 
+            {/* Acciones del formulario. */}
             <div className="flex justify-center space-x-4 border-t border-brand-separator pt-4">
               <button type="button" onClick={limpiarFormulario} className="btn-secondary w-28 py-1.5 text-sm sm:w-32">
                 Limpiar
