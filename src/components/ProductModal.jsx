@@ -74,6 +74,11 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       return;
     }
 
+    if (esEdicion) {
+      const confirmaEdicion = window.confirm(`Seguro que queres guardar los cambios de "${datosFormulario.name}"?`);
+      if (!confirmaEdicion) return;
+    }
+
     if (onSave) onSave(datosFormulario);
     onClose();
   };
@@ -129,10 +134,15 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 Atrás
               </button>
             </div>
-            <div className="flex justify-center col-span-1">
-              <h2 className="text-xl font-title font-bold text-center text-brand-indigo whitespace-nowrap sm:text-2xl">
-                {esEdicion ? 'Editar Producto' : 'Crear Producto'}
-              </h2>
+            <div className="flex flex-col items-center justify-center col-span-1 gap-1">
+              <span className={`rounded-full px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wide ${esEdicion ? 'bg-brand-button text-white' : 'bg-white text-brand-button border border-brand-button/25'}`}>
+                {esEdicion ? 'Modo edicion' : 'Producto nuevo'}
+              </span>
+              {esEdicion && (
+                <p className="max-w-[12rem] truncate text-center text-xs font-semibold text-brand-indigo/60 sm:max-w-[18rem]">
+                  {datosFormulario.name}
+                </p>
+              )}
             </div>
             <div className="hidden sm:block"></div>
           </div>
