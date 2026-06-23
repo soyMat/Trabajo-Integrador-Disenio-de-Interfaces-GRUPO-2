@@ -109,7 +109,13 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         </div>
       )}
 
-      <div className="glass-panel relative flex w-full max-w-2xl animate-in flex-col overflow-hidden duration-200 fade-in zoom-in max-h-[90vh] overflow-y-auto" onClick={(evento) => evento.stopPropagation()}>
+      <div
+        className="glass-panel relative flex w-full max-w-2xl animate-in flex-col overflow-hidden duration-200 fade-in zoom-in max-h-[90vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label={esEdicion ? 'Formulario de edicion de producto' : 'Formulario de producto nuevo'}
+        onClick={(evento) => evento.stopPropagation()}
+      >
         <div className="sticky top-0 z-10 flex w-full justify-center border-b border-brand-separator bg-white py-1.5">
           <button
             type="button"
@@ -210,9 +216,9 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   {errores.category && <p className="mt-1 text-xs font-semibold text-red-600">{errores.category}</p>}
                 </div>
 
-                <fieldset className={`rounded-xl border p-3 flex flex-col gap-2 ${errores.status ? 'border-red-400 bg-red-50' : 'border-brand-separator bg-white/45'}`}>
-                  <legend className="px-1 text-xs font-bold text-brand-indigo">Estado <span className="text-brand-coral">*</span></legend>
-                  <div className="flex flex-col gap-2 pt-1">
+                <fieldset className="flex flex-col gap-1">
+                  <legend className="text-xs font-bold text-brand-indigo">Estado <span className="text-brand-coral">*</span></legend>
+                  <div className={`rounded-xl border p-3 flex flex-col gap-2 ${errores.status ? 'border-red-400 bg-red-50' : 'border-brand-separator bg-white/45'}`}>
                     {['Activo', 'Sin Stock', 'Descontinuado', 'Bajo Stock'].map((estado) => (
                       <label key={estado} className="flex cursor-pointer items-center gap-2">
                         <input type="radio" name="status" value={estado} checked={datosFormulario.status === estado} onChange={cambiarCampo} className="text-brand-button focus:ring-brand-button" />
