@@ -4,6 +4,11 @@ Sistema interno de administracion para un e-commerce de productos regionales de 
 
 El proyecto fue realizado para el TP de Diseño de Interfaces Graficas. La aplicacion permite ingresar al sistema, visualizar productos simulados y administrar altas, ediciones y eliminaciones desde una interfaz responsive.
 
+## Integrantes del Grupo 2
+- Mateo Mazuela
+- Juan Pablo Ocampo
+- Luca Mechulan
+  
 ## Tecnologias
 
 - React

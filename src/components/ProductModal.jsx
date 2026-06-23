@@ -74,6 +74,11 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       return;
     }
 
+    if (esEdicion) {
+      const confirmaEdicion = window.confirm(`Seguro que queres guardar los cambios de "${datosFormulario.name}"?`);
+      if (!confirmaEdicion) return;
+    }
+
     if (onSave) onSave(datosFormulario);
     onClose();
   };
@@ -89,6 +94,8 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   };
 
   const claseCampo = (nombreCampo) => `input-field ${errores[nombreCampo] ? 'input-error' : ''}`;
+
+  const esEdicion = Boolean(initialData);
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-brand-indigo/40 p-5 pt-8 backdrop-blur-sm sm:items-center sm:p-4" onClick={onClose}>
@@ -115,34 +122,83 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         </div>
 
         <div className="p-5 sm:p-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="mb-5 flex items-center text-sm font-semibold text-brand-button transition-colors hover:text-brand-indigo sm:mb-6"
-            aria-label="Volver"
-          >
-            <ChevronLeft size={16} className="mr-1" />
-            Atras
-          </button>
+          <div className="grid grid-cols-3 items-center mb-6 w-full">
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex items-center text-sm font-semibold text-brand-button transition-colors hover:text-brand-indigo"
+                aria-label="Volver"
+              >
+                <ChevronLeft size={16} className="mr-1" />
+                Atrás
+              </button>
+            </div>
+            <div className="flex flex-col items-center justify-center col-span-1 gap-1">
+              <span className={`rounded-full px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wide ${esEdicion ? 'bg-brand-button text-white' : 'bg-white text-brand-button border border-brand-button/25'}`}>
+                {esEdicion ? 'Modo edicion' : 'Producto nuevo'}
+              </span>
+              {esEdicion && (
+                <p className="max-w-[12rem] truncate text-center text-xs font-semibold text-brand-indigo/60 sm:max-w-[18rem]">
+                  {datosFormulario.name}
+                </p>
+              )}
+            </div>
+            <div className="hidden sm:block"></div>
+          </div>
 
-          <form onSubmit={enviarFormulario} className="space-y-5 sm:space-y-6" noValidate>
-            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex flex-col">
-                  <label htmlFor="name" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Nombre del Producto <span className="text-brand-coral">*</span></label>
-                  <input id="name" type="text" name="name" value={datosFormulario.name} onChange={cambiarCampo} className={`${claseCampo('name')} rounded-full bg-white px-4 py-1.5`} />
+          <form onSubmit={enviarFormulario} className="space-y-6" noValidate>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              
+              <div className="flex flex-col gap-4">
+                <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
+                  Información General
+                </h3>
+                
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="name" className="text-brand-indigo text-xs font-bold sm:text-left">
+                    Nombre del Producto <span className="text-brand-coral">*</span>
+                  </label>
+                  <input id="name" type="text" name="name" value={datosFormulario.name} onChange={cambiarCampo} className={claseCampo('name')} />
                   {errores.name && <p className="mt-1 text-xs font-semibold text-red-600">{errores.name}</p>}
                 </div>
 
-                <div className="flex flex-col">
-                  <label htmlFor="description" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Descripcion <span className="text-brand-coral">*</span></label>
-                  <textarea id="description" name="description" value={datosFormulario.description} onChange={cambiarCampo} className={`${claseCampo('description')} h-16 resize-none rounded-xl bg-white px-4 py-2 sm:h-20`}></textarea>
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="description" className="text-brand-indigo text-xs font-bold sm:text-left">
+                    Descripción <span className="text-brand-coral">*</span>
+                  </label>
+                  <textarea id="description" name="description" value={datosFormulario.description} onChange={cambiarCampo} className={`${claseCampo('description')} h-20 resize-none`}></textarea>
                   {errores.description && <p className="mt-1 text-xs font-semibold text-red-600">{errores.description}</p>}
                 </div>
 
-                <div className="flex flex-col">
-                  <label htmlFor="category" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Categoria <span className="text-brand-coral">*</span></label>
-                  <select id="category" name="category" value={datosFormulario.category} onChange={cambiarCampo} className={`${claseCampo('category')} cursor-pointer appearance-none rounded-full bg-white px-4 py-1.5 text-sm`}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="price" className="text-brand-indigo text-xs font-bold sm:text-left">
+                      Precio ($) <span className="text-brand-coral">*</span>
+                    </label>
+                    <input id="price" type="number" name="price" value={datosFormulario.price} onChange={cambiarCampo} min="0.01" step="0.01" className={claseCampo('price')} />
+                    {errores.price && <p className="mt-1 text-xs font-semibold text-red-600">{errores.price}</p>}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="stock" className="text-brand-indigo text-xs font-bold sm:text-left">
+                      Stock (#) <span className="text-brand-coral">*</span>
+                    </label>
+                    <input id="stock" type="number" name="stock" value={datosFormulario.stock} onChange={cambiarCampo} min="0" step="1" className={claseCampo('stock')} />
+                    {errores.stock && <p className="mt-1 text-xs font-semibold text-red-600">{errores.stock}</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <h3 className="text-brand-indigo text-lg font-bold border-b border-brand-separator pb-1">
+                  Estado y Categoría
+                </h3>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="category" className="text-brand-indigo text-xs font-bold sm:text-left">
+                    Categoría <span className="text-brand-coral">*</span>
+                  </label>
+                  <select id="category" name="category" value={datosFormulario.category} onChange={cambiarCampo} className={claseCampo('category')}>
                     <option value="" disabled>Seleccione una categoria</option>
                     <option value="Bebidas">Bebidas</option>
                     <option value="Mermeladas y Dulces">Mermeladas y Dulces</option>
@@ -153,24 +209,35 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   </select>
                   {errores.category && <p className="mt-1 text-xs font-semibold text-red-600">{errores.category}</p>}
                 </div>
-              </div>
 
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex flex-col rounded-xl border border-dashed border-brand-button/30 bg-white/45 p-3">
-                  <label className="mb-2 flex items-center justify-between text-sm font-bold text-brand-indigo">
+                <fieldset className={`rounded-xl border p-3 flex flex-col gap-2 ${errores.status ? 'border-red-400 bg-red-50' : 'border-brand-separator bg-white/45'}`}>
+                  <legend className="px-1 text-xs font-bold text-brand-indigo">Estado <span className="text-brand-coral">*</span></legend>
+                  <div className="flex flex-col gap-2 pt-1">
+                    {['Activo', 'Sin Stock', 'Descontinuado', 'Bajo Stock'].map((estado) => (
+                      <label key={estado} className="flex cursor-pointer items-center gap-2">
+                        <input type="radio" name="status" value={estado} checked={datosFormulario.status === estado} onChange={cambiarCampo} className="text-brand-button focus:ring-brand-button" />
+                        <span className="text-xs font-semibold text-brand-indigo">{estado}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {errores.status && <p className="mt-2 text-xs font-semibold text-red-600">{errores.status}</p>}
+                </fieldset>
+
+                <div className="flex flex-col rounded-xl border border-dashed border-brand-button/30 bg-white/45 p-3 gap-2">
+                  <label className="flex items-center justify-between text-xs font-bold text-brand-indigo">
                     <span>Imagen del Producto</span>
                     <div className="flex space-x-2 text-xs">
-                      <button type="button" onClick={() => setModoImagen('url')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'url' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
+                      <button type="button" onClick={() => setModoImagen('url')} className={`flex items-center rounded px-2 py-0.5 ${modoImagen === 'url' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
                         <LinkIcon size={12} className="mr-1" /> URL
                       </button>
-                      <button type="button" onClick={() => setModoImagen('upload')} className={`flex items-center rounded px-2 py-1 ${modoImagen === 'upload' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
+                      <button type="button" onClick={() => setModoImagen('upload')} className={`flex items-center rounded px-2 py-0.5 ${modoImagen === 'upload' ? 'bg-brand-button text-white' : 'bg-white text-gray-500'}`}>
                         <Upload size={12} className="mr-1" /> Archivo
                       </button>
                     </div>
                   </label>
 
                   {modoImagen === 'url' ? (
-                    <input type="url" name="imageUrl" value={datosFormulario.imageUrl} onChange={cambiarCampo} placeholder="https://ejemplo.com/imagen.jpg" className="input-field rounded bg-white px-3 py-1.5 text-xs" />
+                    <input type="url" name="imageUrl" value={datosFormulario.imageUrl} onChange={cambiarCampo} placeholder="https://ejemplo.com/imagen.jpg" className="input-field px-3 py-1.5 text-xs" />
                   ) : (
                     <div className="flex flex-col items-center">
                       <input type="file" accept="image/*" ref={referenciaArchivo} onChange={cambiarArchivo} className="hidden" />
@@ -186,32 +253,6 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     </div>
                   )}
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <label htmlFor="price" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Precio <span className="text-brand-coral">*</span></label>
-                    <input id="price" type="number" name="price" value={datosFormulario.price} onChange={cambiarCampo} min="0.01" step="0.01" className={`${claseCampo('price')} rounded-full bg-white px-4 py-1.5`} />
-                    {errores.price && <p className="mt-1 text-xs font-semibold text-red-600">{errores.price}</p>}
-                  </div>
-                  <div className="flex flex-col">
-                    <label htmlFor="stock" className="mb-1 text-center text-sm font-bold text-brand-indigo sm:text-left">Stock <span className="text-brand-coral">*</span></label>
-                    <input id="stock" type="number" name="stock" value={datosFormulario.stock} onChange={cambiarCampo} min="0" step="1" className={`${claseCampo('stock')} rounded-full bg-white px-4 py-1.5`} />
-                    {errores.stock && <p className="mt-1 text-xs font-semibold text-red-600">{errores.stock}</p>}
-                  </div>
-                </div>
-
-                <fieldset className={`rounded-xl border p-3 ${errores.status ? 'border-red-400 bg-red-50' : 'border-brand-separator bg-white/45'}`}>
-                  <legend className="px-1 text-sm font-bold text-brand-indigo">Estado <span className="text-brand-coral">*</span></legend>
-                  <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-2">
-                    {['Activo', 'Sin Stock', 'Descontinuado', 'Bajo Stock'].map((estado) => (
-                      <label key={estado} className="flex cursor-pointer items-center space-x-2">
-                        <input type="radio" name="status" value={estado} checked={datosFormulario.status === estado} onChange={cambiarCampo} className="text-brand-button focus:ring-brand-screen" />
-                        <span className="text-xs font-semibold text-brand-indigo">{estado}</span>
-                      </label>
-                    ))}
-                  </div>
-                  {errores.status && <p className="mt-2 text-xs font-semibold text-red-600">{errores.status}</p>}
-                </fieldset>
               </div>
             </div>
 
@@ -220,7 +261,7 @@ const ProductModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 Limpiar
               </button>
               <button type="submit" className="btn-primary w-28 py-1.5 text-sm sm:w-32">
-                Guardar
+                {esEdicion ? 'Guardar' : 'Crear'}
               </button>
             </div>
           </form>
