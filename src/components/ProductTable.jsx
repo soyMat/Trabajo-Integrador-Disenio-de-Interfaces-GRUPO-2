@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import ProductModal from './ProductModal';
 
+// Imagen que se usa cuando un producto no tiene foto propia.
 const imagenPorDefecto = "https://placehold.co/300x300/F7FFF7/1A535C?text=Foto+del+Producto";
 
+// Datos simulados para mostrar el catalogo sin usar una base de datos.
 const productosIniciales = [
   { id: 1, name: 'Dulce de Calafate (200g)', category: 'Mermeladas y Dulces', price: 1200, stock: 45, status: 'Activo', description: 'Exquisito dulce patagonico, ideal para desayunos.', imageUrl: 'https://imgs.search.brave.com/zqFK2uNnphe9lbAqNyYQWy-1LiZMraA2DoPjoa7pD0Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9odHRw/Mi5tbHN0YXRpYy5j/b20vRF9OUV9OUF85/OTY5OTktTUxBNzc4/MTM5MjAxMTBfMDcy/MDI0LU8ud2VicA' },
   { id: 2, name: 'Ahumado de Centolla', category: 'Pescados y Mariscos', price: 3500, stock: 0, status: 'Sin Stock', description: 'Centolla fueguina ahumada con madera de lenga.', imageUrl: 'https://imgs.search.brave.com/mEfrADJvIhUmezBaVCzuICTsNL4DDjP3ge-4qw5YWH0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9odHRw/Mi5tbHN0YXRpYy5j/b20vRF9OUV9OUF83/NTc2NTctTUxBNzAz/OTA4OTM3NTZfMDcy/MDIzLU8ud2VicA' },
@@ -21,12 +23,23 @@ const productosIniciales = [
 
 const ProductTable = () => {
   const navigate = useNavigate();
+
+  // Guarda la lista actual de productos que se muestra en pantalla.
   const [productos, setProductos] = useState(productosIniciales);
+
+  // Controla si el formulario de producto esta abierto o cerrado.
   const [modalAbierto, setModalAbierto] = useState(false);
+
+  // Guarda el producto que se esta editando. Si es null, se crea uno nuevo.
   const [productoEnEdicion, setProductoEnEdicion] = useState(null);
+
+  // Guarda el id del producto que tiene abierto el detalle desplegable.
   const [productoExpandidoId, setProductoExpandidoId] = useState(null);
+
+  // Muestra mensajes de confirmacion despues de crear, editar o eliminar.
   const [mensajeExito, setMensajeExito] = useState('');
 
+  // Devuelve el color del punto de estado segun la situacion del producto.
   const obtenerColorEstado = (estado) => {
     switch (estado) {
       case 'Activo': return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
@@ -37,11 +50,13 @@ const ProductTable = () => {
     }
   };
 
+  // Abre el formulario. Si recibe un producto, lo abre en modo edicion.
   const abrirModal = (producto = null) => {
     setProductoEnEdicion(producto);
     setModalAbierto(true);
   };
 
+  // Guarda un producto nuevo o actualiza uno existente segun tenga id.
   const guardarProducto = (datosFormulario) => {
     if (datosFormulario.id) {
       // Actualiza el producto que ya existe.
@@ -58,6 +73,7 @@ const ProductTable = () => {
     setTimeout(() => setMensajeExito(''), 3000);
   };
 
+  // Elimina un producto despues de pedir confirmacion al usuario.
   const eliminarProducto = (id) => {
     if (window.confirm('Seguro que deseas eliminar este producto?')) {
       setProductos(productos.filter(producto => producto.id !== id));
@@ -66,6 +82,7 @@ const ProductTable = () => {
     }
   };
 
+  // Mantiene el logo como acceso directo a la pantalla de productos.
   const irAProductos = () => navigate('/productos');
 
   return (
@@ -119,6 +136,7 @@ const ProductTable = () => {
           </div>
         ) : (
           <>
+            {/* Version mobile: muestra productos como tarjetas para que sean faciles de tocar. */}
             <div className="space-y-3 md:hidden">
               {productos.map((producto) => (
                 <article key={producto.id} className="rounded-lg border border-brand-separator bg-white/95 p-4 shadow-md shadow-brand-indigo/10">
@@ -156,6 +174,7 @@ const ProductTable = () => {
               ))}
             </div>
 
+            {/* Version desktop: muestra productos en tabla con columnas y detalle desplegable. */}
             <div className="hidden overflow-x-auto pb-4 md:block">
               <table className="w-full text-left text-sm text-brand-indigo border-separate border-spacing-y-2">
                 <thead className="bg-brand-button text-white">
