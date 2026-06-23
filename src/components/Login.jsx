@@ -10,6 +10,7 @@ const Login = () => {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [datosLogin, setDatosLogin] = useState({ email: '', contrasena: '' });
   const [errores, setErrores] = useState({});
+  const [mensajeSecundario, setMensajeSecundario] = useState('');
   const navigate = useNavigate();
 
   const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -18,6 +19,7 @@ const Login = () => {
     const { name, value } = evento.target;
     setDatosLogin(datosPrevios => ({ ...datosPrevios, [name]: value }));
     setErrores(erroresPrevios => ({ ...erroresPrevios, [name]: '', credenciales: '' }));
+    setMensajeSecundario('');
   };
 
   const validarLogin = () => {
@@ -44,6 +46,11 @@ const Login = () => {
   const ingresar = (evento) => {
     evento.preventDefault();
     if (validarLogin()) navigate('/productos');
+  };
+
+  const mostrarAccionSecundaria = (mensaje) => {
+    setMensajeSecundario(mensaje);
+    setTimeout(() => setMensajeSecundario(''), 3500);
   };
 
   return (
@@ -109,6 +116,12 @@ const Login = () => {
             </div>
           )}
 
+          {mensajeSecundario && (
+            <div className="rounded-md border border-brand-button/20 bg-white px-3 py-2 text-center text-xs font-semibold text-brand-indigo sm:text-sm">
+              {mensajeSecundario}
+            </div>
+          )}
+
           <div className="flex justify-center pt-1 pb-4">
             <button type="submit" className="btn-primary w-32 py-2 text-sm sm:w-40 sm:text-lg">
               Iniciar
@@ -116,12 +129,12 @@ const Login = () => {
           </div>
 
           <div className="flex flex-col items-center gap-5 text-sm font-medium sm:flex-row sm:justify-between sm:gap-0">
-            <a href="#" className="text-brand-button hover:text-brand-indigo underline transition-colors">
+            <button type="button" onClick={() => mostrarAccionSecundaria('Te enviaremos las instrucciones para recuperar tu contrasena.')} className="text-brand-button hover:text-brand-indigo underline transition-colors">
               ¿Olvidó su Contraseña?
-            </a>
-            <a href="#" className="text-brand-button hover:text-brand-indigo underline transition-colors">
+            </button>
+            <button type="button" onClick={() => mostrarAccionSecundaria('Tu solicitud de acceso quedo registrada para revision.')} className="text-brand-button hover:text-brand-indigo underline transition-colors">
               Solicitar acceso
-            </a>
+            </button>
           </div>
         </form>
       </div>

@@ -61,6 +61,8 @@ const ProductTable = () => {
   const eliminarProducto = (id) => {
     if (window.confirm('Seguro que deseas eliminar este producto?')) {
       setProductos(productos.filter(producto => producto.id !== id));
+      setMensajeExito('Producto eliminado correctamente.');
+      setTimeout(() => setMensajeExito(''), 3000);
     }
   };
 
@@ -103,8 +105,8 @@ const ProductTable = () => {
         </div>
 
         {mensajeExito && (
-          <div className="mb-4 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-            <CheckCircle size={18} />
+          <div className="mb-4 flex items-center gap-2 rounded-md border border-brand-separator bg-white px-4 py-3 text-sm font-semibold text-brand-indigo shadow-sm">
+            <CheckCircle size={18} className="text-emerald-600" />
             {mensajeExito}
           </div>
         )}
@@ -193,10 +195,10 @@ const ProductTable = () => {
                         </td>
                         <td className="px-4 py-4 rounded-r-lg">
                           <div className="flex justify-center space-x-3 text-brand-indigo/60">
-                            <button onClick={() => abrirModal(producto)} className="p-1 hover:text-brand-button transition-colors" title="Editar">
+                            <button onClick={() => abrirModal(producto)} className="p-1 hover:text-brand-button transition-colors" title="Editar" aria-label={`Editar ${producto.name}`}>
                               <Edit2 size={16} />
                             </button>
-                            <button onClick={() => eliminarProducto(producto.id)} className="p-1 hover:text-brand-coral transition-colors" title="Eliminar">
+                            <button onClick={() => eliminarProducto(producto.id)} className="p-1 hover:text-brand-coral transition-colors" title="Eliminar" aria-label={`Eliminar ${producto.name}`}>
                               <Trash2 size={16} />
                             </button>
                           </div>
