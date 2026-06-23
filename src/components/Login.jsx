@@ -74,7 +74,7 @@ const Login = () => {
               value={datosLogin.email}
               onChange={cambiarCampo}
               placeholder="admin@australmarket.com"
-              className={`input-field bg-white text-center py-2.5 sm:py-3 ${errores.email ? 'input-error' : ''}`}
+              className={`input-field bg-white text-center py-2.5 sm:py-3 ${errores.email || errores.credenciales ? 'border-red-500 ring-2 ring-red-200 focus:border-red-500 focus:ring-red-300' : ''}`}
               aria-invalid={Boolean(errores.email)}
               aria-describedby={errores.email ? 'email-error' : undefined}
             />
@@ -93,7 +93,7 @@ const Login = () => {
                 value={datosLogin.contrasena}
                 onChange={cambiarCampo}
                 placeholder="********"
-                className={`input-field bg-white text-center py-2.5 pr-11 tracking-widest font-bold sm:py-3 ${errores.contrasena ? 'input-error' : ''}`}
+                className={`input-field bg-white text-center py-2.5 pr-11 tracking-widest font-bold sm:py-3 ${errores.contrasena || errores.credenciales ? 'border-red-500 ring-2 ring-red-200 focus:border-red-500 focus:ring-red-300' : ''}`}
                 aria-invalid={Boolean(errores.contrasena)}
                 aria-describedby={errores.contrasena ? 'contrasena-error' : undefined}
               />
